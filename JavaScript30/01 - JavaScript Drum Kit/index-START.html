@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>JS Drum Kit</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+
+  <div class="keys">
+    <div data-key="65" class="key">
+      <kbd>A</kbd>
+      <span class="sound">clap</span>
+    </div>
+    <div data-key="83" class="key">
+      <kbd>S</kbd>
+      <span class="sound">hihat</span>
+    </div>
+    <div data-key="68" class="key">
+      <kbd>D</kbd>
+      <span class="sound">kick</span>
+    </div>
+    <div data-key="70" class="key">
+      <kbd>F</kbd>
+      <span class="sound">openhat</span>
+    </div>
+    <div data-key="71" class="key">
+      <kbd>G</kbd>
+      <span class="sound">boom</span>
+    </div>
+    <div data-key="72" class="key">
+      <kbd>H</kbd>
+      <span class="sound">ride</span>
+    </div>
+    <div data-key="74" class="key">
+      <kbd>J</kbd>
+      <span class="sound">snare</span>
+    </div>
+    <div data-key="75" class="key">
+      <kbd>K</kbd>
+      <span class="sound">tom</span>
+    </div>
+    <div data-key="76" class="key">
+      <kbd>L</kbd>
+      <span class="sound">tink</span>
+    </div>
+  </div>
+
+  <audio data-key="65" src="sounds/clap.wav"></audio>
+  <audio data-key="83" src="sounds/hihat.wav"></audio>
+  <audio data-key="68" src="sounds/kick.wav"></audio>
+  <audio data-key="70" src="sounds/openhat.wav"></audio>
+  <audio data-key="71" src="sounds/boom.wav"></audio>
+  <audio data-key="72" src="sounds/ride.wav"></audio>
+  <audio data-key="74" src="sounds/snare.wav"></audio>
+  <audio data-key="75" src="sounds/tom.wav"></audio>
+  <audio data-key="76" src="sounds/tink.wav"></audio>
+
+
+<script>
+
+const playEffect = function (event) {
+  // keycode는 대소문자에 따라 값이 달라진다.
+  const keyCode = event.keyCode < 77 ? event.keyCode : event.keyCode - 32
+  // 해당 keycode에 맞는 audio 불러오기
+  const audio = document.querySelector(`audio[data-key="${keyCode}"]`)
+  // key 버튼에도 효과를 주어야 하므로 key button 불러오기
+  const key = document.querySelector(`.key[data-key="${keyCode}"]`)
+
+  // key에 따른 audio가 없는 경우 함수 return
+  if (!audio) {return}
+  
+  //key에 효과 주고
+  key.classList.add("playing")
+  //audio 재생
+  audio.currentTime = 0               // 같은 키를 연속해서 누르면 현재 소리가 재생되고 있던 말던 바로바로 소리가 튀어나온다.
+  audio.play()
+}
+
+const removeEffect = function (event) {
+  // console.log(event)         // 효과를 준 요소들이 transition 완료될때마다 event 발생 (border-color, transform 등)
+  // 우리는 transform이 완료되었을 때 나오는 transitioned event만 감지할 것이다.
+  if (event.propertyName !== "transform") {return}
+  // event.target === div.key.playing
+  event.target.classList.remove("playing")
+  // event.target === div.key -> playing class가 삭제됨
+  //console.log(event)
+}
+
+// transitioned 이벤트는 CSS transition이 완료되면 발생한다.
+// 모든 키들에 transtioned 이벤트를 감지하는 eventListener 달아주기
+const keys = document.querySelectorAll(".key")
+keys.forEach( (key) => {
+  key.addEventListener("transitionend", removeEffect)
+})
+
+// 드럼칠때 발생하는 eventListener 달아주기
+window.addEventListener('keypress', playEffect)
+</script>
+</body>
+</html>
